@@ -22,20 +22,22 @@ public class RegistrationController {
 
     // Create a new user
     @PostMapping
-    public ResponseEntity<?> registerUser(@Valid @RequestBody User user, BindingResult result) throws Exception {
-        if (result.hasErrors()) {
-            FieldError fieldError = result.getFieldError();
-            String errorMessage = (fieldError != null) ? fieldError.getDefaultMessage() : "Validation error";
-            return ResponseEntity.badRequest().body(errorMessage);
-        }
-
-        try {
-            User newUser = userService.registerUser(user);
-            return new ResponseEntity<>(newUser, HttpStatus.CREATED);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
-        }
+    public ResponseEntity<?> registerUser(@Valid @RequestBody User user, BindingResult result) {
+    if (result.hasErrors()) {
+        FieldError fieldError = result.getFieldError();
+        String errorMessage = (fieldError != null) ? fieldError.getDefaultMessage() : "Validation error";
+        return ResponseEntity.badRequest().body(errorMessage);
     }
+
+    try {
+        User newUser = userService.registerUser(user);
+        return new ResponseEntity<>(newUser, HttpStatus.CREATED);
+    } catch (IllegalArgumentException e) {
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
+    } catch (Exception e) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An unexpected error occurred: " + e.getMessage());
+    }
+}
 
     // Read all users
     @GetMapping
